@@ -2,7 +2,7 @@ from functions import get_todos, write_todos, get_todos_done, write_todos_done
 import time
 def add_todo(task, count, date):
          try:
-                if not isinstance(count, int) and date<time.strftime('%d%m'):
+                if not isinstance(count) or date<time.strftime('%d%m'):
                    raise ValueError("Невірний тип count або застаріла дата")
                 new_todo = f"{date} {task} 0/{count}\n"
                 todos=get_todos()
