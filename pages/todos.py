@@ -28,21 +28,39 @@ def render_todos_page():
             st.subheader("📝 Редагувати")
             parts = selected_todo.split(' ', 1)
             if len(parts) >= 2:
-                current_date = parts[0]
+                current_date_str = parts[0]  
                 rest = parts[1].rsplit(' ', 1)
                 current_task = rest[0]
                 current_count = rest[1].split('/')[-1]
                 
-                new_date = st.text_input("Змінити дату", value=current_date, max_chars=4)
+                import datetime
+                today = datetime.date.today()
+                
+                try:
+                    default_date = datetime.datetime.strptime(current_date_str, "%d%m").date()
+                    default_date = default_date.replace(year=today.year)
+                    if default_date < today:
+                        default_date = today
+                except ValueError:
+                    default_date = today
+
+                chosen_date = st.date_input(
+                    "Змінити дату", 
+                    value=default_date, 
+                    min_value=today
+                )
+                
+                new_date = chosen_date.strftime("%d%m")
+                
                 new_task = st.text_input("Змінити назву", value=current_task)
                 new_count = st.number_input("Змінити ціль", min_value=1, value=int(current_count))
                 
                 if st.button("Зберегти зміни", use_container_width=True):
-                    if new_task.strip() and len(new_date) == 4 and new_date.isdigit():
+                    if new_task.strip():
                         controller.update_todo(index, new_task.strip(), int(new_count), new_date)
                         st.success("Зміни успішно збережено!")
                         st.rerun()
                     else:
-                        st.error("Некоректні дані при редагуванні!")
+                        st.error("Назва завдання не може бути порожньою!")
 
 render_todos_page()
